@@ -16,19 +16,19 @@ const index = require('./routes/index');
 const NotFoundError = require('./errors/not-found-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-// const CORS_WHITELIST = ['http://localhost:3000'];
-// const corsOption = {
-//   credentials: true,
-//   origin: function checkCorsList(origin, callback) {
-//     if (CORS_WHITELIST.indexOf(origin) !== -1 || !origin) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-// };
+const CORS_WHITELIST = ['http://localhost:3000'];
+const corsOption = {
+  credentials: true,
+  origin: function checkCorsList(origin, callback) {
+    if (CORS_WHITELIST.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
 
-// app.use(helmet());
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(cookieParser());
 mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
@@ -38,7 +38,7 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
   useUnifiedTopology: true,
 });
 app.use(requestLogger);
-// app.use(cors(corsOption));
+app.use(cors(corsOption));
 app.post(
   '/signin',
   celebrate({
