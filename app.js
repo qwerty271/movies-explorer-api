@@ -47,7 +47,7 @@ app.post(
       password: Joi.string().required(),
     }),
   }),
-  login
+  login,
 );
 app.post(
   '/signup',
@@ -58,7 +58,7 @@ app.post(
       name: Joi.string().min(2).max(30),
     }),
   }),
-  createUser
+  createUser,
 );
 app.use(auth);
 app.use(index);
@@ -72,7 +72,8 @@ app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({
     message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-  });
+  })
+    .catch(next);
 });
 
 app.listen(PORT, () => {

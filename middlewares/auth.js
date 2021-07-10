@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(
       cookie,
       // 'secret'
-      config.JWT_SECRET
+      config.JWT_SECRET,
     );
   } catch (err) {
     throw new UnauthorizedError('Необходима авторизация');

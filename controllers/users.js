@@ -8,8 +8,8 @@ const ConflictError = require('../errors/conflict-err');
 const { config } = require('../config');
 
 module.exports.getUser = (req, res, next) => {
-  const user = req.user._id;
-  return User.findById(user)
+  const userId = req.user._id;
+  return User.findById(userId)
     .then((user) => res.status(200).send(user))
     .catch(next);
 };
@@ -22,7 +22,7 @@ module.exports.updateUser = (req, res, next) => {
       console.log('Was error', err);
       if (err.name === 'ValidationError') {
         throw new BadRequestError(
-          'Переданы некорректные данные при редактировании профиля'
+          'Переданы некорректные данные при редактировании профиля',
         );
       } else if (err.name === 'CastError') {
         throw new NotFoundError('Пользователь с указанным _id не найден');
@@ -31,35 +31,32 @@ module.exports.updateUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.createUser = (req, res, next) =>
-  bcrypt
-    .hash(req.body.password, 10)
-    .then((hash) =>
-      User.create({
-        name: req.body.name,
-        email: req.body.email,
-        password: hash,
-      })
-    )
-    .then((user) => {
-      if (user) {
-        return res.status(201).send({
-          name: user.name,
-          email: user.email,
-        });
-      }
-    })
-    .catch((err) => {
-      console.log('Was error', err);
-      if (err.name === 'ValidationError') {
-        throw new BadRequestError(
-          'Переданы некорректные данные при создании профиля'
-        );
-      } else if (err.name === 'MongoError' && err.code === 11000) {
-        throw new ConflictError('Данный электронный адрес уже зарегистрирован');
-      }
-    })
-    .catch(next);
+module.exports.createUser = (req, res, next) => bcrypt
+  .hash(req.body.password, 10)
+  .then((hash) => User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: hash,
+  }))
+  .then((user) => {
+    if (user) {
+      res.status(201).send({
+        name: user.name,
+        email: user.email,
+      });
+    }
+  })
+  .catch((err) => {
+    console.log('Was error', err);
+    if (err.name === 'ValidationError') {
+      throw new BadRequestError(
+        'Переданы некорректные данные при создании профиля',
+      );
+    } else if (err.name === 'MongoError' && err.code === 11000) {
+      throw new ConflictError('Данный электронный адрес уже зарегистрирован');
+    }
+  })
+  .catch(next);
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -69,7 +66,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       if (!user) {
         return Promise.reject(
-          new UnauthorizedError('Неправильные почта или пароль')
+          new UnauthorizedError('Неправильные почта или пароль'),
         );
       }
 
@@ -78,19 +75,19 @@ module.exports.login = (req, res, next) => {
         .then((matched) => {
           if (!matched) {
             return Promise.reject(
-              new UnauthorizedError('Неправильные почта или пароль')
+              new UnauthorizedError('Неправильные почта или пароль'),
             );
           }
           return user;
         })
-        .then((user) => {
+        .then((us) => {
           const token = jwt.sign(
             {
-              _id: user._id,
+              _id: us._id,
             },
             config.JWT_SECRET,
             // 'secret',
-            { expiresIn: '7d' }
+            { expiresIn: '7d' },
           );
 
           res.cookie('jwt', token, {

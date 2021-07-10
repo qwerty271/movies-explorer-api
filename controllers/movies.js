@@ -16,7 +16,7 @@ module.exports.createMovie = (req, res, next) => {
       console.log('Was error', err);
       if (err.name === 'ValidationError') {
         throw new BadRequestError(
-          'Переданы некорректные данные при создании фильма'
+          'Переданы некорректные данные при создании фильма',
         );
       }
     })
@@ -30,9 +30,7 @@ module.exports.deleteMovie = (req, res, next) => {
       if (movie.owner === null) {
         throw new NotFoundError('Фильм удален').catch(next);
       } else if (movie.owner.equals(req.user._id)) {
-        return Movie.findByIdAndRemove(movieId).then((movie) =>
-          res.status(200).send(movie)
-        );
+        return Movie.findByIdAndRemove(movieId).then((movies) => res.status(200).send(movies));
       } else {
         throw new ForbiddenError('Чужой фильм').catch(next);
       }
