@@ -27,6 +27,7 @@ module.exports.updateUser = (req, res, next) => {
       } else if (err.name === 'CastError') {
         throw new NotFoundError('Пользователь с указанным _id не найден');
       }
+      throw new ConflictError('Данный электронный адрес уже зарегистрирован');
     })
     .catch(next);
 };
