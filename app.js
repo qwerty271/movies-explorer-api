@@ -12,7 +12,11 @@ const app = express();
 const index = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const CORS_WHITELIST = ['http://localhost:3000'];
+const CORS_WHITELIST = [
+  'http://localhost:3000',
+  'https://movies-explorer.qwerty271.nomoredomains.monster',
+  'http://movies-explorer.qwerty271.nomoredomains.monster',
+];
 const corsOption = {
   credentials: true,
   origin: function checkCorsList(origin, callback) {
